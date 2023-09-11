@@ -1,47 +1,124 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>تسجيل الدخول</title>
+    <link rel="stylesheet" href="">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+    <body class="bg-gray-100" dir="rtl">
+        <div class="min-h-screen flex items-center justify-center">
+            <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
+                <div class="flex items-center justify-center">
+                    <img src="https://www.ibelieveinsci.com/wp-content/uploads/1628521849226-scaled.jpg" alt="Unsplash Photo"
+                        class="w-20 h-20 rounded-full">
+                </div>
+				<form method="POST" action="{{ route('login') }}">
+					@csrf
+					<div class="mt-4">
+						<label for="email" class="block text-gray-700 font-bold mb-2">الإيميل</label>
+						<input type="email" id="email" name="email"
+							class="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+							value="{{ old('email') }}" required autofocus autocomplete="email">
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+							@if ($errors->get('email'))
+								<ul>
+									@foreach ((array) $errors->get('email') as $message)
+										<li>{{ $message }}</li>
+									@endforeach
+								</ul>
+							@endif
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+					</div>
+					<div class="mt-4">
+						<label for="password" class="block text-gray-700 font-bold mb-2">رقم الجوال</label>
+						<input type="text" id="password" name="password"
+							class="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
+                            required autocomplete="current-password">
+							@if ($errors->get('password'))
+								<ul>
+									@foreach ((array) $errors->get('password') as $message)
+										<li>{{ $message }}</li>
+									@endforeach
+								</ul>
+							@endif
+						{{-- <p id="password-strength" class="text-gray-600 mt-2"></p> --}}
+					</div>
+
+					<!-- Remember Me -->
+					<div class="block mt-4">
+						<label for="remember_me" class="inline-flex items-center">
+							<input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
+							<span class="mr-2 text-sm text-gray-600">{{ __('تذكرني') }}</span>
+						</label>
+					</div>
+
+					<div class="flex items-center justify-end mt-6">
+						{{-- @if (Route::has('password.request'))
+							<a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+								{{ __('Forgot your password?') }}
+							</a>
+						@endif --}}
+
+						<x-primary-button class="mr-3">
+							{{ __('أرسل الآن') }}
+						</x-primary-button>
+					</div>
+				</form>
+			</div>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        <script>
+                const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const passwordStrength = document.getElementById('password-strength');
+        const loginButton = document.getElementById('login-btn');
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+        function checkPasswordStrength(password) {
+            // You can customize this function to implement your own password strength checking logic
+            // For simplicity, let's assume a weak password contains less than 8 characters and a strong one contains 8 or more characters.
+            if (password.length < 8) {
+                return 'Weak';
+            } else {
+                return 'Strong';
+            }
+        }
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+        passwordInput.addEventListener('input', function () {
+            const password = passwordInput.value;
+            const strength = checkPasswordStrength(password);
+            passwordStrength.textContent = 'Password Strength: ' + strength;
+        });
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+        loginButton.addEventListener('click', function () {
+            const email = emailInput.value;
+            const password = passwordInput.value;
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
+            // Basic email and password validation for demonstration purposes
+            if (email.trim() === '') {
+                alert('Please enter your email.');
+                return;
+            }
 
-            <x-primary-button class="ml-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+            if (password.trim() === '') {
+                alert('Please enter your password.');
+                return;
+            }
+
+            // Check if the password is strong enough
+            const strength = checkPasswordStrength(password);
+            if (strength === 'Weak') {
+                alert('Your password is too weak. Please choose a stronger one.');
+                return;
+            }
+
+            // If all validations pass, proceed with login or form submission here.
+            // For this example, we will just show an alert indicating successful login.
+            alert('Login Successful!');
+        });
+        </script>
+</body>
+</html>
